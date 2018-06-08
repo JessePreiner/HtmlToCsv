@@ -2,13 +2,17 @@
 using HtmlAgilityPack;
 using System.IO;
 using XmlParser;
+using CsvHelper;
+using System.Text;
 
 namespace HtmlToCsv
 {
     class Program
     {
+
         static void Main(string[] args)
         {
+            PostParser _postParser;
             Post[] posts = new Post[] { };
 
             if (args != null && args.Length > 0) {
@@ -23,13 +27,18 @@ namespace HtmlToCsv
                                       $"because {ex.GetBaseException().Message}");
                     return;
                 }
-                var doc = new HtmlDocument();
-                doc.LoadHtml(html);
 
-                foreach (var item in doc.DocumentNode.ChildNodes)
-                {
-                    Console.WriteLine(item.InnerHtml);
+                _postParser = new PostParser(new HtmlPostContentParser(new HtmlDocument()), html);
+
+                Post result = _postParser.ToPost();
+                using (TextWriter writer = new StreamWriter(@"output.csv")) {
+                    CsvWriter csv = new CsvWriter(writer);
+                    csv.WriteHeader<Post>();
+                    csv.WriteRecord(result);
+                    csv.NextRecord();
                 }
+
+
             } else {
                 Console.WriteLine("No filename provided");
             }

@@ -1,5 +1,4 @@
 ﻿using HtmlAgilityPack;
-using System.Collections.Generic;
 using System;
 using System.Linq;
 
@@ -10,24 +9,14 @@ namespace XmlParser
         private IPostContentParser _parser;
         private Post[] posts;
 
-        public PostParser(IPostContentParser contentParser, string rawContent)
+        public PostParser(IPostContentParser contentParser, string rawPost)
         {
             _parser = contentParser;
-            _parser.LoadRawContent(rawContent);
+            _parser.LoadRawContent(rawPost);
         }
 
-        public List<Post> ToPosts(string[] rawPosts)
-        {
-            List<Post> result = new List<Post> { };
 
-            foreach (var rawPost in rawPosts)
-            {
-                result.Add(ToPost(rawPost));
-            }
-            return result;
-        }
-
-        public Post ToPost(string rawContent)
+        public Post ToPost()
         {
             return _parser.GetPost();
         }
@@ -54,18 +43,27 @@ namespace XmlParser
             return new Post
             {
                 author = GetAuthor(),
-                description = $"Description {guid}",
+                description = GetDescription(),
                 original_id = guid,
                 posted_date = DateTime.UtcNow
             };
         }
 
         string GetAuthor() {
+            return GetTagValue(htmlTag:"//meta", searchField:"name", searchValue:"author", returnProp:"content");
+        }
+
+        string GetDescription()
+        {
+            return GetTagValue(htmlTag: "//meta", searchField: "name", searchValue: "description", returnProp: "content");
+        }
+
+        string GetTagValue(string htmlTag, string searchField, string searchValue, string returnProp) {
             return _htmlDoc.DocumentNode
-                           .SelectNodes("meta")
+                           .SelectNodes(htmlTag)
                            .SingleOrDefault(node => node
-                                            .GetAttributeValue("name", "") == "author")
-                           .GetAttributeValue("content", "");
+                                            .GetAttributeValue(searchField, "") == searchValue)
+                           .GetAttributeValue(returnProp, "");
         }
 
         public void LoadRawContent(string rawContent)

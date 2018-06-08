@@ -1,14 +1,16 @@
 ﻿using System;
+using CsvHelper.Configuration;
+
 namespace XmlParser
 {
     public class Post
     {
-        public string title;
-        public string author;
-        public string description;
-        public string original_id;
-        public string[] images;
-        public DateTime posted_date;
+        public string title { get; set; }
+        public string author { get; set; }
+        public string description { get; set; }
+        public string original_id { get; set; }
+        public string[] images { get; set; }
+        public DateTime posted_date { get; set; }
 
         public Post(){}
 
@@ -17,6 +19,15 @@ namespace XmlParser
             this.title = title;
             this.description = description;
             this.original_id = original_id;
+        }
+
+        public sealed class MyClassMap : ClassMap<Post>
+        {
+            public MyClassMap()
+            {
+                AutoMap();
+                //Map(m => m.CreatedDate).Ignore();
+            }
         }
     }
 }

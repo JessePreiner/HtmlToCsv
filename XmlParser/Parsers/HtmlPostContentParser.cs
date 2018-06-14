@@ -13,6 +13,11 @@ namespace XmlParser
             _htmlDoc = doc;
         }
 
+        public void LoadRawContent(string rawContent)
+        {
+            _htmlDoc.LoadHtml(rawContent);
+        }
+
         public Post GetPost()
         {
             string guid = Guid.NewGuid().ToString();
@@ -42,11 +47,6 @@ namespace XmlParser
                            .SingleOrDefault(node => node
                                             .GetAttributeValue(searchField, "") == searchValue)
                            .GetAttributeValue(returnProp, "");
-        }
-
-        public void LoadRawContent(string rawContent)
-        {
-            _htmlDoc.LoadHtml(rawContent);
         }
     }
 }

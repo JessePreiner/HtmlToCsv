@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace HtmlToCsv
 {
-    partial class Program
+    internal partial class Program
     {
         static void Main(string[] args)
         {
@@ -32,36 +32,33 @@ namespace HtmlToCsv
             if (ProcessingFileList(opts)) { ProcessFileList(opts.InputFiles, opts.CsvName); }
         }
 
-        private static void ProcessFileList(IEnumerable<string> inputFiles, string outputFilePath)
+        static void ProcessFileList(IEnumerable<string> inputFiles, string outputFilePath)
         {
-            /*
-             * 
-             * htmlfiles <- getHtmlFilesFromInputFiles(inputFiles)
-             * posts <- getPostsFromHtmlFiles(htmlFiles)
-             * csv = getCsvFromPosts(posts)
-             * 
-             * 
-             */
 
             PostParser _postParser;
             Post[] posts = new Post[] { };
             string[] htmlFiles = inputFiles.Select(GetHtmlFromFile).ToArray();
 
 
-            _postParser = new PostParser(new HtmlPostContentParser(new HtmlDocument()), htmlFiles[0]);
+            _postParser = new PostParser(new HtmlPostContentParser(new HtmlDocument()));
+            _postParser.SetPosts(htmlFiles);
+            posts = _postParser.ToPosts();
 
-            Post result = _postParser.ToPost();
             using (TextWriter writer = new StreamWriter(outputFilePath))
             {
                 CsvWriter csv = new CsvWriter(writer);
                 csv.WriteHeader<Post>();
-                csv.WriteRecord(result);
+
+                foreach (Post post in posts)
+                {
+                    csv.WriteRecord(post);
+                }
                 csv.NextRecord();
             }
         }
 
-
-        private static string GetHtmlFromFile(string filePath) {
+        static string GetHtmlFromFile(string filePath)
+        {
             String html = null;
             try
             {
@@ -76,29 +73,29 @@ namespace HtmlToCsv
             return html;
         }
 
-        private static void ProcessSitemap(string sitemapUrl, string outputFileName)
+        static void ProcessSitemap(string sitemapUrl, string outputFileName)
         {
             throw new NotImplementedException("Currently only works for input files (the first one)");
         }
 
-        private static bool ProcessingFileList(ArgumentOptions opts)
+        static bool ProcessingFileList(ArgumentOptions opts)
         {
             return opts.InputFiles.Count() > 0;
         }
 
-        private static bool ProcessingSitemap(ArgumentOptions opts)
+        static bool ProcessingSitemap(ArgumentOptions opts)
         {
             return !String.IsNullOrEmpty(opts.SitemapUrl);
         }
 
-        private static void LogOptions(ArgumentOptions opts)
+        static void LogOptions(ArgumentOptions opts)
         {
             Console.WriteLine($"csv:\t\t{opts.CsvName}\n" +
                               $"input files:\t{String.Join(",", opts.InputFiles)}\n" +
                               $"sitemap:\t{opts.SitemapUrl}\n\n");
         }
 
-        private static bool ImpossibleArgumentConfiguration(ArgumentOptions opts)
+        static bool ImpossibleArgumentConfiguration(ArgumentOptions opts)
         {
             return ProcessingSitemap(opts) && ProcessingFileList(opts);
         }

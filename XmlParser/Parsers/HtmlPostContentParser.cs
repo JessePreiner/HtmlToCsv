@@ -4,30 +4,6 @@ using System.Linq;
 
 namespace XmlParser
 {
-    public class PostParser
-    {
-        private IPostContentParser _parser;
-        private Post[] posts;
-
-        public PostParser(IPostContentParser contentParser, string rawPost)
-        {
-            _parser = contentParser;
-            _parser.LoadRawContent(rawPost);
-        }
-
-
-        public Post ToPost()
-        {
-            return _parser.GetPost();
-        }
-    }
-
-    public interface IPostContentParser
-    {
-        Post GetPost();
-        void LoadRawContent(string rawContent);
-    }
-
     public class HtmlPostContentParser : IPostContentParser
     {
         HtmlDocument _htmlDoc;
@@ -49,8 +25,9 @@ namespace XmlParser
             };
         }
 
-        string GetAuthor() {
-            return GetTagValue(htmlTag:"//meta", searchField:"name", searchValue:"author", returnProp:"content");
+        string GetAuthor()
+        {
+            return GetTagValue(htmlTag: "//meta", searchField: "name", searchValue: "author", returnProp: "content");
         }
 
         string GetDescription()
@@ -58,7 +35,8 @@ namespace XmlParser
             return GetTagValue(htmlTag: "//meta", searchField: "name", searchValue: "description", returnProp: "content");
         }
 
-        string GetTagValue(string htmlTag, string searchField, string searchValue, string returnProp) {
+        string GetTagValue(string htmlTag, string searchField, string searchValue, string returnProp)
+        {
             return _htmlDoc.DocumentNode
                            .SelectNodes(htmlTag)
                            .SingleOrDefault(node => node

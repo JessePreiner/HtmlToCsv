@@ -28,12 +28,21 @@ namespace HtmlToCsv
                 return;
             }
 
-            if (ProcessingSitemap(opts)) { ProcessSitemap(opts.SitemapUrl); }
-            if (ProcessingFileList(opts)) { ProcessFileList(opts.InputFiles); }
+            if (ProcessingSitemap(opts)) { ProcessSitemap(opts.SitemapUrl, opts.CsvName); }
+            if (ProcessingFileList(opts)) { ProcessFileList(opts.InputFiles, opts.CsvName); }
         }
 
-        private static void ProcessFileList(IEnumerable<string> inputFiles)
+        private static void ProcessFileList(IEnumerable<string> inputFiles, string outputFilePath)
         {
+            /*
+             * 
+             * htmlfiles <- getHtmlFilesFromInputFiles(inputFiles)
+             * posts <- getPostsFromHtmlFiles(htmlFiles)
+             * csv = getCsvFromPosts(posts)
+             * 
+             * 
+             */
+
             PostParser _postParser;
             Post[] posts = new Post[] { };
 
@@ -53,7 +62,7 @@ namespace HtmlToCsv
             _postParser = new PostParser(new HtmlPostContentParser(new HtmlDocument()), html);
 
             Post result = _postParser.ToPost();
-            using (TextWriter writer = new StreamWriter(@"output.csv"))
+            using (TextWriter writer = new StreamWriter(outputFilePath))
             {
                 CsvWriter csv = new CsvWriter(writer);
                 csv.WriteHeader<Post>();
@@ -62,7 +71,7 @@ namespace HtmlToCsv
             }
         }
 
-        private static void ProcessSitemap(string sitemapUrl)
+        private static void ProcessSitemap(string sitemapUrl, string outputFileName)
         {
             throw new NotImplementedException("Currently only works for input files (the first one)");
         }

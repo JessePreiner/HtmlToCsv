@@ -45,21 +45,10 @@ namespace HtmlToCsv
 
             PostParser _postParser;
             Post[] posts = new Post[] { };
+            string[] htmlFiles = inputFiles.Select(GetHtmlFromFile).ToArray();
 
 
-            String html = null;
-            try
-            {
-                html = File.ReadAllText(inputFiles.First());
-            }
-            catch (FileNotFoundException ex)
-            {
-                Console.WriteLine($"Can't read the file {inputFiles.First()} " +
-                                  $"because {ex.GetBaseException().Message}");
-                return;
-            }
-
-            _postParser = new PostParser(new HtmlPostContentParser(new HtmlDocument()), html);
+            _postParser = new PostParser(new HtmlPostContentParser(new HtmlDocument()), htmlFiles[0]);
 
             Post result = _postParser.ToPost();
             using (TextWriter writer = new StreamWriter(outputFilePath))
@@ -69,6 +58,22 @@ namespace HtmlToCsv
                 csv.WriteRecord(result);
                 csv.NextRecord();
             }
+        }
+
+
+        private static string GetHtmlFromFile(string filePath) {
+            String html = null;
+            try
+            {
+                html = File.ReadAllText(filePath);
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine($"Can't read the file {filePath} " +
+                                  $"because {ex.GetBaseException().Message}");
+                throw new Exception($"Can't read from input file at {filePath}", ex);
+            }
+            return html;
         }
 
         private static void ProcessSitemap(string sitemapUrl, string outputFileName)

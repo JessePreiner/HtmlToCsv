@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace HtmlToCsv
 {
-    internal partial class Program
+    partial class Program
     {
         static void Main(string[] args)
         {

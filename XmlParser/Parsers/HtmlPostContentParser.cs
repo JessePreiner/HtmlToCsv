@@ -26,8 +26,15 @@ namespace XmlParser
                 author = GetAuthor(),
                 description = GetDescription(),
                 original_id = guid,
-                posted_date = DateTime.UtcNow
+                posted_date = GetDate()
             };
+        }
+
+        private DateTime GetDate()
+        {
+            var dateNode = _htmlDoc.DocumentNode.Descendants().
+                                     SingleOrDefault(node => node.HasClass("post-date") && node.Name == "div");
+            return dateNode != null ? DateTime.Parse(dateNode.InnerHtml) : new DateTime();
         }
 
         string GetAuthor()

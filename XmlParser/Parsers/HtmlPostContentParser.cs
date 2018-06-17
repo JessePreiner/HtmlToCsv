@@ -24,17 +24,30 @@ namespace XmlParser
             return new Post
             {
                 author = GetAuthor(),
+                content = GetContent(),
+                title = GetTitle(),
                 description = GetDescription(),
                 original_id = guid,
                 posted_date = GetDate()
             };
         }
 
-        private DateTime GetDate()
+        string GetTitle()
+        {
+            var titleNode = _htmlDoc.DocumentNode.Descendants().SingleOrDefault(node => node.Name == "title");
+            return titleNode!= null ? titleNode.InnerText : "";
+        }
+
+        DateTime GetDate()
         {
             var dateNode = _htmlDoc.DocumentNode.Descendants().
                                      SingleOrDefault(node => node.HasClass("post-date") && node.Name == "div");
-            return dateNode != null ? DateTime.Parse(dateNode.InnerHtml) : new DateTime();
+            return dateNode != null ? DateTime.Parse(dateNode.InnerText) : new DateTime();
+        }
+
+        string GetContent() {
+            var contentNode = _htmlDoc.DocumentNode.Descendants().SingleOrDefault(node => node.HasClass("post-body") && node.HasClass("section"));
+            return contentNode != null ? contentNode.InnerHtml : "";
         }
 
         string GetAuthor()

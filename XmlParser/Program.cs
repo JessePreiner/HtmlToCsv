@@ -48,12 +48,13 @@ namespace HtmlToCsv
             {
                 CsvWriter csv = new CsvWriter(writer);
                 csv.WriteHeader<Post>();
+                csv.NextRecord();
 
                 foreach (Post post in posts)
                 {
                     csv.WriteRecord(post);
+                    csv.NextRecord();
                 }
-                csv.NextRecord();
             }
         }
 

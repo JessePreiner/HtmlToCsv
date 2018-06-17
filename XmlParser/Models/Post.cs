@@ -5,12 +5,13 @@ namespace XmlParser
 {
     public class Post
     {
-        public string title { get; set; }
-        public string author { get; set; }
-        public string description { get; set; }
         public string original_id { get; set; }
-        public string[] images { get; set; }
         public DateTime posted_date { get; set; }
+        public string author { get; set; }
+        public string title { get; set; }
+        public string description { get; set; }
+        public string[] images { get; set; }
+        public string content { get; set; }
 
         public Post(){}
 
@@ -26,7 +27,6 @@ namespace XmlParser
             public MyClassMap()
             {
                 AutoMap();
-                //Map(m => m.CreatedDate).Ignore();
             }
         }
     }
